@@ -1,0 +1,46 @@
+@charset "UTF-8";
+
+body {
+		width: 100% auto;
+}
+
+p{
+		font-size: 20px;
+		font-family: "Open Sans";
+		margin-left: 10px;
+}
+
+.page {
+		text-align: center;
+}
+
+#main-screen {
+		width: 480;
+		height: 512;
+		border:1px solid black;
+}
+
+.editable-content:hover {
+		background-color: lightblue;
+}
+
+#player-type:hover, .editable-content:hover{
+		cursor: pointer;
+}
+
+.header {
+    background-color: #eff0f1;
+    color: #454d4d;
+    border-bottom: 1px solid #e5e9ea;
+    margin-bottom: 3em;
+    position: relative;
+    z-index: 5;
+    font-family: "Open Sans";
+    height: 65px;
+		padding: 10px;
+}
+
+.header .container {
+    display: flex;
+    height: 100%;
+}
