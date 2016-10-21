@@ -162,6 +162,7 @@ $(document).ready(function(){
 	var pokeballTouched = false;
 	var pokemonLifeTime;
 	var count = 0;
+	var capture = false;
 	//all pokemons
 	var sprites = [bellsprout, bullbasaur, caterpie, charmander, dratini, eevee, abra, zaptos, jigglypuff, mankey, meowth, mew, pidgey, pikachu, psyduck, rattata, snorlax, squirtle, venonat, weedle, zubat];
 
@@ -191,22 +192,43 @@ $(document).ready(function(){
 						ctx.drawImage(OpenPokeball, pokeballX, pokeballY, 25, 25);
 					}
 					var drawingPokeball = window.setTimeout(function(){
+							ctx.drawImage(pokeball, pokeballX, pokeballY, 25, 25);
 							count++;
-							if (count == 5) {
+							if (count == 50) {
 									if (Math.floor(Math.random() * 2) == 1){
-											ctx.drawImage(gotcha, pokeballX, pokeballY, 25, 25);
+											capture = true;
+											count = pokeballY;
+											if (pokeballY==50){
+													count++;
+											}
 											var pokemonCaught = document.createElement("img");
 											pokemonCaught.src = sprites[pokemonAux].src;
 											document.getElementById("all-pokemons").appendChild(pokemonCaught);
+									}else{
+										hasPokemon = false;
+										createPokemon = 0;
+										pokeballTouched = false;
+										count = 0
 									}
-									hasPokemon = false;
-									createPokemon = 0;
-									pokeballTouched = false;
-									count = 0
 									clearTimeout(drawingPokeball);
 							}
-					ctx.drawImage(pokeball, pokeballX, pokeballY, 25, 25);
-				}, 200);
+					}, 200);
+				if (capture) {
+						if (pokeballY<count+10){
+							pokeballY++;
+						}else{
+							pokeballY--;
+						}
+						ctx.drawImage(gotcha, pokeballX, pokeballY, 30, 30);
+						var got = window.setTimeout(function(){
+								hasPokemon = false;
+								createPokemon = 0;
+								pokeballTouched = false;
+								count = 0
+								clearTimeout(got);
+						}, 2000);
+				}
+
 		}
 		//chance to draw a pokemon
 		else if ( createPokemon != 29 ){
