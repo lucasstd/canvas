@@ -148,117 +148,130 @@ star.src = "pics/star.png";
 
 
 $(document).ready(function(){
-	var canvas = document.getElementById("main-screen");
-	var ctx = canvas.getContext("2d");
-	canvas.width = 512;
-	canvas.height = 480;
+		//init canvas
+		var canvas = document.getElementById("main-screen");
+		var ctx = canvas.getContext("2d");
+		canvas.width = 512;
+		canvas.height = 480;
 
-	//var to draw pokemon at this point
-	var pokemonX, pokemonY;
-	//Who is this pokemon?
-	var pokemonAux;
-	var createPokemon = 0;
-	var hasPokemon = false;
-	var pokeballTouched = false;
-	var pokemonLifeTime;
-	var count = 0;
-	var capture = false;
-	//all pokemons
-	var sprites = [bellsprout, bullbasaur, caterpie, charmander, dratini, eevee, abra, zaptos, jigglypuff, mankey, meowth, mew, pidgey, pikachu, psyduck, rattata, snorlax, squirtle, venonat, weedle, zubat];
 
-	function getPosition(event){
-		if (hasPokemon) {
-				var x = event.x - canvas.offsetLeft;
-  			var y = event.y - canvas.offsetTop;
-				if (x <= pokemonX+30 && x >= pokemonX-30 && y <= pokemonY+30 && y >= pokemonY-30) {
-						clearTimeout(pokemonLifeTime);
-						pokeballTouched = true;
-						pokeballX = pokemonX;
-						pokeballY = pokemonY;
-				}
-		}
-	}
+		//pokemon/pokeball coordinates
+		var pokemonX, pokemonY, pokeballX, pokeballY;
+		//Who is this pokemon?
+		var pokemonAux;
+		var createPokemon = 0;
+		var hasPokemon = false;
+		var pokeballTouched = false;
+		var pokemonLifeTime;
+		var count = 0;
+		var capture = false;
 
-	canvas.addEventListener("mouseup", getPosition, false);
+		//all pokemons
+		var sprites = [bellsprout, bullbasaur, caterpie, charmander, dratini, eevee, abra, zaptos, jigglypuff, mankey, meowth, mew, pidgey, pikachu, psyduck, rattata, snorlax, squirtle, venonat, weedle, zubat];
 
-	// Draw everything
-	var render = function () {
-			ctx.clearRect(0, 0, canvas.width, canvas.height);
-			//background draw (no interect with it)
-			ctx.drawImage(bgImage, 0, 0);
 
-			if ( pokeballTouched ){
-					if(count == 0) {
-						ctx.drawImage(OpenPokeball, pokeballX, pokeballY, 25, 25);
+		function getPosition(event){
+			if (hasPokemon)
+			{
+					var x = event.x - canvas.offsetLeft;
+	  			var y = event.y - canvas.offsetTop;
+					if (x <= pokemonX+30 && x >= pokemonX-30 && y <= pokemonY+30 && y >= pokemonY-30)
+					{
+							clearTimeout(pokemonLifeTime);
+							pokeballTouched = true;
+							pokeballX = pokemonX;
+							pokeballY = pokemonY;
 					}
-					var drawingPokeball = window.setTimeout(function(){
-							ctx.drawImage(pokeball, pokeballX, pokeballY, 25, 25);
-							count++;
-							if (count == 50) {
-									if (Math.floor(Math.random() * 2) == 1){
-											capture = true;
-											count = pokeballY;
-											if (pokeballY==50){
-													count++;
-											}
-											var pokemonCaught = document.createElement("img");
-											pokemonCaught.src = sprites[pokemonAux].src;
-											document.getElementById("all-pokemons").appendChild(pokemonCaught);
-									}else{
+			}
+		}
+
+		canvas.addEventListener("mouseup", getPosition, false);
+
+
+		// Draw everything
+		var render = function () {
+				//background draw (no interect with it)
+				ctx.drawImage(bgImage, 0, 0);
+
+				if ( pokeballTouched )
+				{
+						if (capture)
+						{
+								ctx.drawImage(gotcha, pokeballX, pokeballY, 30, 30);
+								//shows gotcha for some time, then set all variables again
+								var captured = window.setTimeout(function(){
 										hasPokemon = false;
-										createPokemon = 0;
 										pokeballTouched = false;
-										count = 0
-									}
-									clearTimeout(drawingPokeball);
-							}
-					}, 200);
-				if (capture) {
-						if (pokeballY<count+10){
-							pokeballY++;
-						}else{
-							pokeballY--;
+										count = 0;
+										capture=false;
+										clearTimeout(captured);
+								}, 1000);
 						}
-						ctx.drawImage(gotcha, pokeballX, pokeballY, 30, 30);
-						var got = window.setTimeout(function(){
-								hasPokemon = false;
-								createPokemon = 0;
-								pokeballTouched = false;
-								count = 0
-								clearTimeout(got);
-						}, 2000);
+
+						else if(count < 10)
+						{
+								ctx.drawImage(OpenPokeball, pokeballX, pokeballY, 25, 25);
+								count+=0.5;
+						}
+
+						else
+						{
+							var drawingPokeball = window.setTimeout(function(){
+									ctx.drawImage(pokeball, pokeballX, pokeballY, 25, 25);
+									count++;
+									if (count == 50) {
+											if (Math.floor(Math.random() * 2) == 1){
+													capture = true;
+													count = pokeballY;
+													if (pokeballY==50){
+															count++;
+													}
+													var pokemonCaught = document.createElement("img");
+													pokemonCaught.src = sprites[pokemonAux].src;
+													document.getElementById('caught').appendChild(pokemonCaught);
+											}
+											else{
+													createPokemon = 0;
+													hasPokemon = false;
+													pokeballTouched = false;
+													count = 0
+											}
+											clearTimeout(drawingPokeball);
+									}
+							}, 200);
+						}
 				}
 
-		}
-		//chance to draw a pokemon
-		else if ( createPokemon != 29 ){
-				createPokemon = Math.floor(Math.random()*30);
-		}
-		else {   //draw a pokemon
-				if (hasPokemon){
-						ctx.drawImage(sprites[pokemonAux], pokemonX, pokemonY);
-					}else{
-							//pokemon choose
-							pokemonAux = Math.floor(Math.random()*21);
+				else if ( createPokemon != 29 ){  //chance to draw a pokemon
+						createPokemon = Math.floor(Math.random()*30);
+				}
 
-							pokemonX = 32 + (Math.random() * (canvas.width - 94));
-							pokemonY = 32 + (Math.random() * (canvas.height - 94));
+				else {   //draw a pokemon
+						if (hasPokemon){
+								ctx.drawImage(sprites[pokemonAux], pokemonX, pokemonY);
+						}
+						else{
+								//pokemon choose
+								pokemonAux = Math.floor(Math.random()*21);
+								//map place
+								pokemonX = 32 + (Math.random() * (canvas.width - 94));
+								pokemonY = 32 + (Math.random() * (canvas.height - 94));
 
-							hasPokemon = true;
+								hasPokemon = true;
 
-							//if 5 seconds and the pokemon stays there another pokemon can be draw
-							pokemonLifeTime = window.setTimeout(function(){
-								createPokemon = 0;
-								hasPokemon = false;
-							}, 1200);
-					}
-		}
-	};
+								//if 1 second and the pokemon stays there another pokemon can be draw
+								pokemonLifeTime = window.setTimeout(function(){
+										createPokemon = 0;
+										hasPokemon = false;
+								}, 1000);
+						}
+				}
+		};
 
-	var mainloop = function() {
-        render();
-  };
-	// have a most efficient way to do this
-	// 16.6666 = 60 FPS
-	setInterval( mainloop, 16.6666 );
+		var mainloop = function() {
+	        render();
+	  };
+		// have a most efficient way to do this
+		// 16.6666 = 60 FPS
+		setInterval( mainloop, 16.6666 );
 });
